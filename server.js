@@ -1,9 +1,13 @@
 const express = require('express');
 const axios = require('axios');
 
+const cors = require('cors');
 require('dotenv').config();
 
 const app = express();
+app.use(cors());
+
+app.use(express.json());
 
 
 
@@ -16,13 +20,13 @@ const https = require('https');
 const fs = require('fs');
 
 // Load SSL certificate files
-const privateKey = fs.readFileSync('privkey.pem', 'utf8');
-const certificate = fs.readFileSync('fullchain.pem', 'utf8');
+  
+  const sslOptions = {
+    key: fs.readFileSync('privkey.pem'),      // Path to your private key file
+    cert: fs.readFileSync('fullchain.pem'), // Path to your certificate file
+  };
 
-const credentials = {
-  key: privateKey,
-  cert: certificate
-};
+  const server = https.createServer(sslOptions, app);
 
 app.get('/anime/epnum/:source/:anilistId', async (req, res) => {
     try {
@@ -326,7 +330,6 @@ app.get('/anime/link/:anilistId', async (req, res) => {
     }
   });
   
-  const server = https.createServer(credentials, app);
 
 server.listen(port, () => {
   console.log(`Server listening on port ${port}`);
